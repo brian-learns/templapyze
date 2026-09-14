@@ -15,7 +15,7 @@ runner = CliRunner()
 def test_plan_mode_writes_nothing(tmp_path: Path) -> None:
     """--plan prints the rename table without creating the target."""
     target = tmp_path / "demo"
-    result = runner.invoke(app, [str(target), "--plan"])
+    result = runner.invoke(app, [str(target), "--plan", "--author", "Test <t@example.com>"])
     assert result.exit_code == 0, result.output
     assert "src/tpl8 -> src/demo" in result.output
     assert not target.exists()
@@ -26,7 +26,7 @@ def test_nonempty_target_refused(tmp_path: Path) -> None:
     target = tmp_path / "demo"
     target.mkdir()
     (target / "keep.txt").write_text("here", encoding="utf-8")
-    result = runner.invoke(app, [str(target)])
+    result = runner.invoke(app, [str(target), "--author", "Test <t@example.com>"])
     assert result.exit_code == 1
     assert "not empty" in result.stderr
 
@@ -36,7 +36,7 @@ def test_target_inside_template_refused(tmp_path: Path) -> None:
     from templapyze.plan import load_bundled_template
 
     root = load_bundled_template().root
-    result = runner.invoke(app, [str(root / "demo"), "--from", str(root), "--plan"])
+    result = runner.invoke(app, [str(root / "demo"), "--from", str(root), "--plan", "--author", "Test <t@example.com>"])
     assert result.exit_code == 1
     assert "must not be the template" in result.stderr
 
