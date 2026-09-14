@@ -1,0 +1,73 @@
+[project]
+name = "templapyze"
+version = "0.1.0"
+description = "Bootstrap a new Python project from a template"
+readme = "README.md"
+authors = [
+    { name = "brian-learns", email = "epitome-tampers.1v@icloud.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.13.5",
+    "typer>=0.27.2",
+]
+
+[project.scripts]
+templapyze = "templapyze.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "bandit>=1.9.4",
+    "interrogate>=1.7.0",
+    "pytest>=9.1.1",
+    "refurb>=2.3.1",
+    "ruff>=0.16.6",
+    "ty>=0.0.78",
+    "vulture>=2.16",
+]
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E",   # Pycodestyle errors
+    "F",   # Pyflakes (catches undefined names / unused variables)
+    "B",   # Bugbear (catches common design anti-patterns)
+    "S",   # Bandit Automated Security checks
+    "I",   # Isort (enforces clean import sorting structures)
+    "N",   # PEP8 Naming convention enforcement
+    "RUF", # Ruff-specific absolute modern rules
+    "ANN", # Flake8-annotations (fails on missing type hints)
+]
+ignore = [
+    "S101",   # Allows 'assert' statements for pytest modules
+    "E501",   # Let the formatter handle long agent lines, don't trigger lint errors
+    "ANN002", # Missing type annotation for *args
+    "ANN003", # Missing type annotation for **kwargs
+]
+
+
+[tool.bandit]
+skips = ["B101", "B404", "B602"]
+
+[tool.interrogate]
+fail-under = 90
+exclude = ["tests"]
+ignore-init-method = true
+ignore-module = true
+
+[tool.ty]
+rules = { all = "error" }
+
+[tool.uv]
+exclude-newer = "7 days"
+
+[tool.templapyze]
+# Provenance: this project was generated from a templapyze template
+# (manual run, Phase B — see docs/bootstrap-log.md).
+origin = "tpl8"
+version = "0.1.0"
