@@ -3,6 +3,11 @@ name: templapyze
 description: A CLI that bootstraps a new Python project from a hash-pinned template. Use when asked to generate or scaffold a new project with templapyze.
 ---
 
+<!--
+SPDX-License-Identifier: 0BSD
+Copyright (c) 2026 templapyze creators and contributors
+-->
+
 # templapyze
 
 Generates a new Python project (uv package + static test pipeline) from a

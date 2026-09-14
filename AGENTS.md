@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: 0BSD
+Copyright (c) 2026 templapyze creators and contributors
+-->
+
 # AGENTS.md
 
 Non-obvious details and guidance for AI coding agents working in this repository.

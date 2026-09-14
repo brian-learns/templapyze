@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 """Unit tests for the templapyze plan: names, manifest, rename table, snapshot."""
 
 import shutil

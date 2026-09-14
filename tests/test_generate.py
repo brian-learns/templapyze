@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 """CLI tests for templapyze: plan mode, safety, and the end-to-end pipeline."""
 
 import re

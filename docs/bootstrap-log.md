@@ -1,3 +1,8 @@
+<!--
+SPDX-License-Identifier: 0BSD
+Copyright (c) 2026 templapyze creators and contributors
+-->
+
 # Bootstrap log: manual templapyze run (Phase B)
 
 Source: tpl8 tag `v0.1.0` (commit `96a6a5d`), extracted via

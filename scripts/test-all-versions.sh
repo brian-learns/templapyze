@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 #!/usr/bin/env sh
 # Run the test suite on every supported Python version (see requires-python).
 #

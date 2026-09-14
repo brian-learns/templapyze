@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 """The templapyze pipeline: copy, rename, personalize, sync, gate, commit."""
 
 import re
@@ -25,7 +28,7 @@ CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 {copyright}
 """
 
-_HEADER_SUFFIXES = {".py", ".toml", ".yml", ".md"}
+_HEADER_SUFFIXES = {".py", ".toml", ".yml", ".md", ".sh"}
 _HEADER_NAMES = {"Makefile", ".gitignore"}
 
 

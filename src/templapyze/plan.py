@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 """Template resolution, name normalization, and the rename plan."""
 
 import hashlib

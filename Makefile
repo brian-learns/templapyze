@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: 0BSD
+# Copyright (c) 2026 templapyze creators and contributors
+
 REQUIRED_EXECUTABLES = uv rm find
 MIN_UV_VERSION = 0.12
 
