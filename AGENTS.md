@@ -37,6 +37,10 @@ in the wheel); this file covers *developing* it.
 - **Tests**: CLI behavior via `typer.testing.CliRunner` (assert `exit_code`
   and `output`/`stderr`); model behavior directly; `pytest.raises` for
   expected `ValidationError`s.
+- **Licensing**: generated projects are 0BSD — the pipeline writes a
+  `LICENSE` and stamps an SPDX header (after any YAML frontmatter; HTML
+  comment for `.md`) plus `license = "0BSD"` in pyproject. Never remove the
+  frontmatter-first ordering for SKILL.md.
 
 ## Gotchas
 

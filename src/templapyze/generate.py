@@ -4,9 +4,29 @@ import re
 import shutil
 import subprocess
 import tempfile
+from datetime import date
 from pathlib import Path
 
 from templapyze.plan import GenerationError, RenamePlan, TemplateSpec, load_bundled_template
+
+# 0BSD, with a per-project copyright line (see _license).
+_LICENSE_TEXT = """Permission to use, copy, modify, and/or distribute this software
+for any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE
+AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
+CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT,
+NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+{copyright}
+"""
+
+_HEADER_SUFFIXES = {".py", ".toml", ".yml", ".md"}
+_HEADER_NAMES = {"Makefile", ".gitignore"}
 
 
 def generate_project(
@@ -31,6 +51,7 @@ def generate_project(
     _rename_paths(plan)
     _replace_tokens(plan)
     _personalize(plan)
+    _license(plan)
     _run(["uv", "sync"], plan.target)
     _run(["make", "test"], plan.target)
     _git(plan)
@@ -123,6 +144,8 @@ def _personalize(plan: RenamePlan) -> None:
     )
     author_entry = f"    {{ name = {_toml_str(plan.author.name)}, email = {_toml_str(plan.author.email)} }}"
     text = re.sub(r"authors = \[[^\]]*\]", f"authors = [\n{author_entry}\n]", text, count=1, flags=re.DOTALL)
+    if "license = " not in text:
+        text = re.sub(r'^(requires-python = ".*")$', r'\1\nlicense = "0BSD"', text, count=1, flags=re.MULTILINE)
     text = _replace_provenance(text, plan.template.package, plan.template.version)
     pyproject.write_text(text, encoding="utf-8")
     _write_readme(plan)
@@ -151,6 +174,38 @@ def _replace_provenance(text: str, origin: str, version: str) -> str:
         f'version = "{version}"\n'
     )
     return re.sub(r"\[tool\.templapyze\].*?(?=\n\[|\Z)", block, text, count=1, flags=re.DOTALL)
+
+
+def _license(plan: RenamePlan) -> None:
+    """Write the 0BSD LICENSE and stamp a license header on the generated files."""
+    copyright_line = f"Copyright (c) {date.today().year} {plan.dist_name} creators and contributors"
+    (plan.target / "LICENSE").write_text(_LICENSE_TEXT.format(copyright=copyright_line), encoding="utf-8")
+    for path in sorted(plan.target.rglob("*")):
+        if not path.is_file():
+            continue
+        if path.suffix not in _HEADER_SUFFIXES and path.name not in _HEADER_NAMES:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if "SPDX-License-Identifier" in text[:200]:
+            continue
+        path.write_text(_insert_header(text, _license_header(path, copyright_line)), encoding="utf-8")
+
+
+def _license_header(path: Path, copyright_line: str) -> str:
+    """The license header for a file: '#' style, or an HTML comment for markdown."""
+    if path.suffix == ".md":
+        return f"<!--\nSPDX-License-Identifier: 0BSD\n{copyright_line}\n-->"
+    return f"# SPDX-License-Identifier: 0BSD\n# {copyright_line}"
+
+
+def _insert_header(text: str, header: str) -> str:
+    """Prepend the license header, after any leading YAML frontmatter block."""
+    lines = text.split("\n")
+    if lines and lines[0].strip() == "---":
+        for i in range(1, len(lines)):
+            if lines[i].strip() == "---":
+                return "\n".join((*lines[: i + 1], "", *header.split("\n"), *lines[i + 1 :]))
+    return header + "\n\n" + text
 
 
 def _toml_str(value: str) -> str:
