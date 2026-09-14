@@ -20,7 +20,7 @@ _NAME_RE = re.compile(r"[-_.]+")
 
 # The bundled template is a hash-pinned tar archive: data, not code, so the
 # static tools in the Makefile never scan the vendored template's sources.
-BUNDLED_ARCHIVE = Path(__file__).parent / "templates" / "tpl8-v0.1.0.tar"
+BUNDLED_ARCHIVE = Path(__file__).parent / "templates" / "tpl8-v0.2.0.tar"
 
 
 class GenerationError(Exception):

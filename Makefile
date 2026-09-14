@@ -42,7 +42,12 @@ check:
 	uv run interrogate src/
 
 	@echo "\n— security scan"
-	UV_MALWARE_CHECK=1 uv audit --preview-features audit-command --preview-features malware-check
+	# audit-command/malware-check are preview flags on uv >= 0.12; older uvs fall back to the plain audit
+	uvver=$$(uv --version | awk '{print $$2}'); \
+	awk -v v="$$uvver" -v min="0.12.0" \
+		'BEGIN{split(v,a,".");split(min,b,".");exit !(a[1]+0>b[1]+0||(a[1]+0==b[1]+0&&a[2]+0>=b[2]+0))}' \
+	&& UV_MALWARE_CHECK=1 uv audit --preview-features audit-command --preview-features malware-check \
+	|| UV_MALWARE_CHECK=1 uv audit
 
 format:
 	uv run ruff format src/

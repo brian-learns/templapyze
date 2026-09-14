@@ -43,7 +43,7 @@ def test_module_name() -> None:
 def test_bundled_template_loads(template: TemplateSpec) -> None:
     """The vendored snapshot is a valid templapyze template."""
     assert template.package == "tpl8"
-    assert template.version == "0.1.0"
+    assert template.version == "0.2.0"
     assert "Makefile" in template.files
     assert "tests" in template.files
 
@@ -112,7 +112,7 @@ def test_snapshot_integrity() -> None:
 
 def test_snapshot_detects_tampering(tmp_path: Path) -> None:
     """verify_snapshot raises when the archive changes."""
-    archive = tmp_path / "tpl8-v0.1.0.tar"
+    archive = tmp_path / "tpl8-v0.2.0.tar"
     shutil.copyfile(BUNDLED_ARCHIVE, archive)
     shutil.copyfile(BUNDLED_ARCHIVE.with_name(BUNDLED_ARCHIVE.name + ".sha256"), archive.with_name(archive.name + ".sha256"))
     with archive.open("ab") as fp:

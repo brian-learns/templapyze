@@ -49,7 +49,7 @@ in the wheel); this file covers *developing* it.
 
 ## Gotchas
 
-- The bundled template is a tar archive (`templates/tpl8-v0.1.0.tar` +
+- The bundled template is a tar archive (`templates/tpl8-v0.2.0.tar` +
   `.sha256` sidecar) on purpose: it is *data*, so the static tools never scan
   the vendored template's sources (a vendored tree breaks refurb/mypy's src
   layout resolution). Update it by re-vendoring from a tpl8 tag and

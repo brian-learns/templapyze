@@ -66,10 +66,11 @@ integration-test fixture for the real `templapyze` command (Phase C).
   "full template tree as package data", but a vendored tree breaks
   refurb/mypy (missing `tpl8` module in the vendored tests; "Source file
   found twice" from the nested `src/` dir) and would need per-tool excludes.
-  Instead: `templates/tpl8-v0.1.0.tar` (deterministic ustar, sorted file
-  list) + `.sha256` sidecar; `verify_snapshot` checks the hash on every
+  Instead: `templates/tpl8-v<version>.tar` (deterministic ustar, sorted
+  file list) + `.sha256` sidecar; `verify_snapshot` checks the hash on every
   invocation; `load_bundled_template()` extracts to a temp dir per run.
   Data, not code — the static tools never see the template's sources.
+  (Re-vendored as `tpl8-v0.2.0.tar` after the Makefile uv<0.12 fix.)
 - **`MYPYPATH=src` in the Makefile** — refurb (mypy) mis-resolves the src
   layout once the package has cross-module imports ("Source file found
   twice"). The greeter never hit this because it had no cross-module imports.
