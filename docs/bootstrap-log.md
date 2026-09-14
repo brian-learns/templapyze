@@ -54,3 +54,32 @@ integration-test fixture for the real `templapyze` command (Phase C).
 - **Ordering constraint** — the manifest→provenance replacement happens
   *after* the token rename; doing it before would let the rename rewrite
   `origin = "tpl8"`.
+
+## Phase C (tool implementation) — deviations and gotchas
+
+- **Vendored template is a tar archive, not a tree** — the design said
+  "full template tree as package data", but a vendored tree breaks
+  refurb/mypy (missing `tpl8` module in the vendored tests; "Source file
+  found twice" from the nested `src/` dir) and would need per-tool excludes.
+  Instead: `templates/tpl8-v0.1.0.tar` (deterministic ustar, sorted file
+  list) + `.sha256` sidecar; `verify_snapshot` checks the hash on every
+  invocation; `load_bundled_template()` extracts to a temp dir per run.
+  Data, not code — the static tools never see the template's sources.
+- **`MYPYPATH=src` in the Makefile** — refurb (mypy) mis-resolves the src
+  layout once the package has cross-module imports ("Source file found
+  twice"). The greeter never hit this because it had no cross-module imports.
+- **Gate = `make test` only** — `make test` already depends on `check`, so
+  running both in the pipeline would double the static pass.
+- **typer + ruff B008** — `typer.Argument/Option` in signature defaults need
+  `[tool.ruff.lint.flake8-bugbear] extend-immutable-calls`.
+- **bandit B603 + ruff S603** — non-constant executables are flagged even
+  with `shell=False`; needs *both* `# noqa: S603` (ruff) and `# nosec B603`
+  (bandit) in the same comment. `shutil.which` for the git path (S607).
+- **ty (all=error)** — `dict[str, Any]` from `tomllib` is not assignable to
+  `dict[str, object]` (invariance); use `cast`.
+- **Safety check runs before `--plan`** — a plan for an unsafe target
+  (non-empty dir, target inside the template) is refused, not printed.
+- **Follow-up (not done)**: the template's `description` is still
+  "Add your description here" (tpl8 placeholder), so generated projects
+  inherit it unless `--description` is passed. Worth a tpl8 v0.2.0 +
+  re-vendor.

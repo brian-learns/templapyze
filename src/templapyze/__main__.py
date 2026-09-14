@@ -1,40 +1,36 @@
-"""Minimal typer + pydantic example: typer parses args, pydantic validates and renders."""
+"""templapyze: bootstrap a new Python project from a template."""
+
+from pathlib import Path
 
 import typer
-from pydantic import BaseModel, Field, ValidationError, field_validator
+
+from templapyze.generate import GenerationError, generate_project
+from templapyze.plan import BUNDLED_ARCHIVE, verify_snapshot
 
 app = typer.Typer()
 
 
-class Greeting(BaseModel):
-    """A greeting, validated and rendered by pydantic."""
-
-    name: str = Field(min_length=1)
-    formal: bool = False
-
-    @field_validator("name", mode="before")
-    def normalize_name(name: str) -> str:  # noqa: N805 -- pydantic validator, not a method
-        """Strip surrounding whitespace from the name."""
-        return name.strip()
-
-    def render(self) -> str:
-        """Format the greeting for output."""
-        salutation = "Good day" if self.formal else "Hello"
-        return f"{salutation} from templapyze to {self.name}!"
-
-
 @app.command()
-def greet(
-    name: str = typer.Option("world", help="Who to greet."),
-    formal: bool = typer.Option(False, help="Use a formal salutation."),
+def run(
+    directory: Path = typer.Argument(..., help="Target directory for the new project."),
+    from_source: str | None = typer.Option(
+        None, "--from", help="Template source: path or git+<url>. Default: bundled."
+    ),
+    name: str | None = typer.Option(None, help="Project name. Default: PEP 503 normalization of the directory name."),
+    description: str | None = typer.Option(None, help="Project description. Default: the template's."),
+    author: str | None = typer.Option(None, "--author", help="Author as 'Name <email>'. Default: git config."),
+    python: str | None = typer.Option(None, "--python", help="Python version pin. Default: the template's."),
+    no_commit: bool = typer.Option(False, "--no-commit", help="Skip the first git commit."),
+    force: bool = typer.Option(False, "--force", help="Proceed even if the target directory is not empty."),
+    plan: bool = typer.Option(False, "--plan", help="Print the rename plan and exit without writing anything."),
 ) -> None:
-    """Greet someone by name."""
+    """Generate a new Python project from a template."""
     try:
-        greeting = Greeting(name=name, formal=formal)
-    except ValidationError as err:
-        typer.echo(err, err=True)
+        verify_snapshot(BUNDLED_ARCHIVE)
+        generate_project(directory, from_source, name, description, author, python, not no_commit, force, plan)
+    except GenerationError as err:
+        typer.echo(str(err), err=True)
         raise typer.Exit(code=1) from err
-    typer.echo(greeting.render())
 
 
 def main() -> None:

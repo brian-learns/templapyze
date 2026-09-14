@@ -1,13 +1,14 @@
 REQUIRED_EXECUTABLES = uv rm find
 MIN_UV_VERSION = 0.12
 
-.PHONY: help check test test-all-versions clean testpackages checkdeps format
+.PHONY: help check test test-integration test-all-versions clean testpackages checkdeps format
 
 help:
 	@echo ""
 	@echo "  make check      Run ultra-fast static testing pipeline (ruff, bandit, vulture, etc.)"
 	@echo "  make format     Auto-fix lint issues and format src/ with ruff"
 	@echo "  make test       Run static checks followed immediately by pytest"
+	@echo "  make test-integration  Run slow end-to-end tests (generates a real project)"
 	@echo "  make test-all-versions  Run pytest on every supported Python version"
 	@echo "  make clean      Wipe out test tool cache tracking footprints"
 	@echo "  make init       Initialize new project with uv and test setup"
@@ -28,7 +29,8 @@ check:
 	uv run vulture src/ --min-confidence 80
 
 	@echo "\n— [A tool for refurbishing and modernizing Python codebases](https://github.com/dosisod/refurb)"
-	uv run refurb src/
+	# MYPYPATH=src: disambiguate the src layout for mypy (refurb's engine) when the package has cross-module imports
+	MYPYPATH=src uv run refurb src/
 
 	@echo "\n— [An extremely fast Python type checker and language server]( https://docs.astral.sh/ty/)"
 	uv run ty check src/
@@ -45,6 +47,9 @@ format:
 
 test: check
 	uv run pytest -v --durations=5
+
+test-integration:
+	uv run pytest -v --durations=5 -m integration
 
 test-all-versions:
 	sh scripts/test-all-versions.sh
